@@ -1,0 +1,23 @@
+# https://github.com/wsargent/docker-cheat-sheet
+
+version: '2'
+
+services:
+  portainer:
+    image: 'portainer/portainer:develop'
+    container_name: portainer
+    restart: always
+    networks:
+      - nginx-proxy
+    environment:
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_HOST=portainer.${REMOTE_IPV4}.xip.io
+      - VIRTUAL_PORT=9000
+      #- LETSENCRYPT_HOST=
+      #- LETSENCRYPT_EMAIL=
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+networks:
+  nginx-proxy:
+    external: true
