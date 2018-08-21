@@ -1,0 +1,18 @@
+# https://github.com/wsargent/docker-cheat-sheet
+
+version: '2.0'
+
+services:
+  adminer:
+    container_name: adminer
+    networks:
+      - nginx-proxy
+    image: adminer
+    environment:
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_HOST=adminer.${REMOTE_IPV4}.xip.io
+      - VIRTUAL_PORT=${PORT}
+    restart: always
+networks:
+  nginx-proxy:
+      external: true

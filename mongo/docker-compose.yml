@@ -1,0 +1,19 @@
+# https://github.com/wsargent/docker-cheat-sheet
+
+version: '2.0'
+
+services:
+  mongo:
+    container_name: mongo
+    networks:
+      - nginx-proxy
+    image: mongo:latest
+    ports:
+      - '127.0.0.1:27017:27017'
+    volumes:
+      - './data:/data/db'
+    restart: always
+
+networks:
+  nginx-proxy:
+    external: true
