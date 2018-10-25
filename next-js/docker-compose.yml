@@ -1,0 +1,20 @@
+# https://github.com/wsargent/docker-cheat-sheet
+
+version: '2'
+
+networks:
+  nginx-proxy:
+    external: true
+
+services:
+  next-js:
+    build: .
+    restart: always
+    networks:
+      - nginx-proxy
+    environment:
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_HOST=next-js.${REMOTE_IPV4}.xip.io
+      - VIRTUAL_PORT=3000
+      - HEALTH_CHECKER=http
+      - HEALTH_TIMEOUT=5000
