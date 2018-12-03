@@ -1,0 +1,19 @@
+deploy:
+  stage: deploy
+  image: gitlab/dind:latest
+  only:
+    - "master"
+  environment: production
+  services:
+    - docker:dind
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$DEPLOY_SERVER_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H $DEPLOYMENT_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - *createEnv
+    - scp -r ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
+    - ssh user@$DEPLOYMENT_SERVER_IP "docker stop {{PROJECT_NAME}}; docker-compose -f docker-compose.yml --project-name=$(date +%s) up -d;"

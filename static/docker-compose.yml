@@ -1,20 +1,23 @@
 # https://github.com/wsargent/docker-cheat-sheet
 
-version: '2.0'
+version: '2'
+
+networks:
+  nginx-proxy:
+    external: true
 
 services:
   {{PROJECT_NAME}}:
-    container_name: {{PROJECT_NAME}}
+    build: .
+    image: {{REGISTRY_URL}}/{{PROJECT_NAME}}:latest
+    restart: always
     networks:
       - nginx-proxy
-    image: adminer:latest
     environment:
       - VIRTUAL_NETWORK=nginx-proxy
       - VIRTUAL_HOST={{VIRTUAL_HOST}}
       - VIRTUAL_PORT={{VIRTUAL_PORT}}
+      - HEALTH_CHECKER=http
+      - HEALTH_TIMEOUT=5000
       {{#LETSENCRYPT_HOST}}- LETSENCRYPT_HOST={{LETSENCRYPT_HOST}}{{/LETSENCRYPT_HOST}}
       {{#LETSENCRYPT_EMAIL}}- LETSENCRYPT_EMAIL={{LETSENCRYPT_EMAIL}}{{/LETSENCRYPT_EMAIL}}
-    restart: always
-networks:
-  nginx-proxy:
-      external: true
