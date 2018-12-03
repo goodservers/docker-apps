@@ -15,7 +15,7 @@ RUN yarn install
 
 RUN chmod 777 /app
 
-COPY ./harden.sh /usr/local/bin/harden.sh
+COPY ./.deploy/harden.sh /usr/local/bin/harden.sh
 RUN chmod 777 /usr/local/bin/harden.sh
 RUN /usr/local/bin/harden.sh
 
