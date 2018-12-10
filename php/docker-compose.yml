@@ -4,6 +4,9 @@ networks:
   nginx-proxy:
     external: true
 
+volumes:
+  datavolume: {}
+
 services:
   {{PROJECT_NAME}}-nginx:
     build:
