@@ -11,7 +11,7 @@ services:
     build:
       dockerfile: ./.deploy/Dockerfile
       context: .
-    image: {{REGISTRY_URL}}:latest
+    image: {{{REGISTRY_URL}}}:latest
     restart: always
     networks:
       - nginx-proxy
