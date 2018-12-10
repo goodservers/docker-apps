@@ -9,7 +9,7 @@ networks:
 services:
   {{PROJECT_NAME}}:
     build: .
-    image: {{REGISTRY_URL}}/{{PROJECT_NAME}}:latest
+    image: {{REGISTRY_URL}}:latest
     restart: always
     networks:
       - nginx-proxy

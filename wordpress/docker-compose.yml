@@ -9,7 +9,7 @@ services:
     build:
       dockerfile: ./.deploy/nginx/Dockerfile
       context: .
-    image: {{REGISTRY_URL}}/{{PROJECT_NAME}}/nginx:latest
+    image: {{REGISTRY_URL}}/nginx:latest
     networks:
       - nginx-proxy
     environment:
@@ -33,7 +33,7 @@ services:
     build:
       dockerfile: ./.deploy/php/Dockerfile
       context: .
-    image: {{REGISTRY_URL}}/{{PROJECT_NAME}}/php:latest
+    image: {{REGISTRY_URL}}/php:latest
     restart: always
     ports:
       - 9000

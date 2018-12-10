@@ -11,7 +11,7 @@ services:
     build:
       dockerfile: ./.deploy/Dockerfile
       context: .
-    image: {{REGISTRY_URL}}/{{PROJECT_NAME}}:latest
+    image: {{REGISTRY_URL}}:latest
     restart: always
     networks:
       - nginx-proxy
@@ -19,5 +19,7 @@ services:
       - VIRTUAL_NETWORK=nginx-proxy
       - VIRTUAL_HOST={{VIRTUAL_HOST}}
       - VIRTUAL_PORT={{VIRTUAL_PORT}}
+      {{#LETSENCRYPT_HOST}}- LETSENCRYPT_HOST={{LETSENCRYPT_HOST}}{{/LETSENCRYPT_HOST}}
+      {{#LETSENCRYPT_EMAIL}}- LETSENCRYPT_EMAIL={{LETSENCRYPT_EMAIL}}{{/LETSENCRYPT_EMAIL}}
       - HEALTH_CHECKER=http
       - HEALTH_TIMEOUT=5000
