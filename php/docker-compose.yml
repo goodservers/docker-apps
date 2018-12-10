@@ -1,0 +1,48 @@
+version: '2'
+
+networks:
+  nginx-proxy:
+    external: true
+
+services:
+  {{PROJECT_NAME}}-nginx:
+    build:
+      dockerfile: ./.deploy/nginx/Dockerfile
+      context: .
+    image: {{{REGISTRY_URL}}}/nginx:latest
+    networks:
+      - nginx-proxy
+    environment:
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_HOST={{VIRTUAL_HOST}}
+      - VIRTUAL_PORT={{VIRTUAL_PORT}}
+      - HEALTH_CHECKER=http
+      {{#LETSENCRYPT_HOST}}- LETSENCRYPT_HOST={{LETSENCRYPT_HOST}}{{/LETSENCRYPT_HOST}}
+      {{#LETSENCRYPT_EMAIL}}- LETSENCRYPT_EMAIL={{LETSENCRYPT_EMAIL}}{{/LETSENCRYPT_EMAIL}}
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    volumes_from:
+      - {{PROJECT_NAME}}-php
+    links:
+      - {{PROJECT_NAME}}-php
+    depends_on:
+      - {{PROJECT_NAME}}-php
+    restart: always
+  {{PROJECT_NAME}}-php:
+    build:
+      dockerfile: ./.deploy/php/Dockerfile
+      context: .
+    image: {{{REGISTRY_URL}}}/php:latest
+    restart: always
+    ports:
+      - 9000
+    volumes:
+      - datavolume:/var/www/html
+    environment:
+      - PHP_UPLOAD_MAX_SIZE=256M
+      - PHP_POST_MAX_SIZE=256M
+    env_file:
+      - .env
+    networks:
+      - nginx-proxy

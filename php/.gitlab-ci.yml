@@ -1,0 +1,54 @@
+# specify env variables saved in Gitlab
+.createEnv: &createEnv |
+  echo "EXAMPLE=${EXAMPLE}" >> .env
+
+stages:
+  - build
+  - deploy
+build:
+  stage: build
+  image: docker:latest
+  only:
+    - "master"
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    CONTAINER_IMAGE_NGINX: $CI_REGISTRY/$CI_PROJECT_PATH/nginx
+    CONTAINER_IMAGE_PHP: $CI_REGISTRY/$CI_PROJECT_PATH/php
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - docker version
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker pull $CONTAINER_IMAGE_NGINX:latest || true
+    - docker build -f ./.deploy/nginx/Dockerfile --cache-from $CONTAINER_IMAGE_NGINX:latest --tag $CONTAINER_IMAGE_NGINX:$CI_BUILD_REF --tag $CONTAINER_IMAGE_NGINX:latest .
+    - docker push $CONTAINER_IMAGE_NGINX:$CI_BUILD_REF
+    - docker push $CONTAINER_IMAGE_NGINX:latest
+
+    - docker pull $CONTAINER_IMAGE_PHP:latest || true
+    - docker build -f ./.deploy/php/Dockerfile --cache-from $CONTAINER_IMAGE_PHP:latest --tag $CONTAINER_IMAGE_PHP:$CI_BUILD_REF --tag $CONTAINER_IMAGE_PHP:latest .
+    - docker push $CONTAINER_IMAGE_PHP:$CI_BUILD_REF
+    - docker push $CONTAINER_IMAGE_PHP:latest
+  after_script:
+    - docker logout $CI_REGISTRY
+deploy:
+  stage: deploy
+  image: gitlab/dind:latest
+  only:
+    - "master"
+  environment: production
+  services:
+    - docker:dind
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$DEPLOY_SERVER_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H $DEPLOYMENT_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - *createEnv
+    - scp -r ./.env ./.deploy ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
+    - ssh user@$DEPLOYMENT_SERVER_IP "docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} registry.gitlab.com; docker-compose pull; docker-compose -f docker-compose.yml --project-name=$(date +%y%m%d%H%M%S) up -d;"
