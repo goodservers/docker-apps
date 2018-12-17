@@ -1,0 +1,23 @@
+version: '2'
+
+networks:
+  nginx-proxy:
+    external: true
+
+services:
+  {{PROJECT_NAME}}:
+    build:
+      dockerfile: ./.deploy/Dockerfile
+      context: .
+    image: {{{REGISTRY_URL}}}:latest
+    restart: always
+    networks:
+      - nginx-proxy
+    environment:
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_HOST={{VIRTUAL_HOST}}
+      - VIRTUAL_PORT={{VIRTUAL_PORT}}
+      - HEALTH_CHECKER=http
+      {{#LETSENCRYPT_HOST}}- LETSENCRYPT_HOST={{LETSENCRYPT_HOST}}{{/LETSENCRYPT_HOST}}
+      {{#LETSENCRYPT_EMAIL}}- LETSENCRYPT_EMAIL={{LETSENCRYPT_EMAIL}}{{/LETSENCRYPT_EMAIL}}
+
