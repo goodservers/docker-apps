@@ -13,8 +13,8 @@ services:
     volumes:
       - '/docker/{{PROJECT_NAME}}/data:/data/db'
     environment:
-      MONGO_INITDB_ROOT_USERNAME: {{DB_MONGO_INITDB_ROOT_USERNAME}}
-      MONGO_INITDB_ROOT_PASSWORD: {{DB_MONGO_INITDB_ROOT_PASSWORD}}
+      MONGO_INITDB_ROOT_USERNAME: {{DB_USERNAME}}
+      MONGO_INITDB_ROOT_PASSWORD: {{DB_PASSWORD}}
     restart: always
 
 networks:
