@@ -1,3 +1,7 @@
+.createEnv: &createEnv |
+  echo "MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}" >> .env
+  echo "MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}" >> .env
+
 stages:
   - deploy
 deploy:
@@ -16,5 +20,6 @@ deploy:
     - ssh-add ~/.ssh/id_rsa
     - ssh-keyscan -H $DEPLOYMENT_SERVER_IP >> ~/.ssh/known_hosts
   script:
-    - scp -r ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
+    - *createEnv
+    - scp -r ./.env ./docker-compose.yml user@$DEPLOYMENT_SERVER_IP:~/
     - ssh user@$DEPLOYMENT_SERVER_IP "docker stop {{PROJECT_NAME}}; docker-compose -f docker-compose.yml --project-name=$(date +%s) up -d;"

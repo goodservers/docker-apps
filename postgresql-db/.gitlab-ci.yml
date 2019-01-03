@@ -1,3 +1,6 @@
+.createEnv: &createEnv |
+  echo "POSTGRES_PASSWORD=${DB_PASSWORD}" >> .env
+
 deploy:
   stage: deploy
   image: gitlab/dind:latest
@@ -15,5 +18,5 @@ deploy:
     - ssh-keyscan -H $DEPLOYMENT_SERVER_IP >> ~/.ssh/known_hosts
   script:
     - *createEnv
-    - scp -r ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
+    - scp -r ./.env ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
     - ssh user@$DEPLOYMENT_SERVER_IP "docker stop {{PROJECT_NAME}}; docker-compose -f docker-compose.yml --project-name=$(date +%s) up -d;"

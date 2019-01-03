@@ -16,10 +16,9 @@ services:
     volumes:
       - "/docker/{{PROJECT_NAME}}/data:/var/lib/mysql"
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: {{DB_PASSWORD}}
-      MYSQL_USER: {{DB_USER}}
-      MYSQL_PASSWORD: {{DB_USER_PASSWORD}}
+    env_file:
+      - .env
+
 networks:
   nginx-proxy:
       external: true
