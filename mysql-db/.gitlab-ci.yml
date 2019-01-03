@@ -2,7 +2,8 @@
   echo "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" >> .env
   echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
   echo "MYSQL_USER=${MYSQL_USER}" >> .env
-
+variables:
+  CONTAINER_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
 stages:
   - build
   - deploy
@@ -15,7 +16,6 @@ build:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
-    CONTAINER_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
   before_script:
@@ -45,5 +45,5 @@ deploy:
     - ssh-keyscan -H $DEPLOYMENT_SERVER_IP >> ~/.ssh/known_hosts
   script:
     - *createEnv
-    - scp -r ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
-    - ssh user@$DEPLOYMENT_SERVER_IP "docker stop {{PROJECT_NAME}}; docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com; docker pull $CONTAINER_IMAGE:latest; docker-compose -f docker-compose.yml --project-name=$(date +%s) up -d;"
+    - scp -r ./docker-compose.yml user@$DEPLOYMENT_SERVER_IP:~/
+    - ssh user@$DEPLOYMENT_SERVER_IP "docker stop {{PROJECT_NAME}}; docker rm {{PROJECT_NAME}}; docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com; docker pull $CONTAINER_IMAGE:latest; docker-compose -f docker-compose.yml --project-name=$(date +%s) up -d;"
