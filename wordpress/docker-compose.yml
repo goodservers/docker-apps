@@ -39,6 +39,7 @@ services:
       - 9000
     environment:
       - WORDPRESS_DB_HOST=mysql:3306
+      - WORDPRESS_VERSION={{WORDPRESS_VERSION}}
       - PHP_UPLOAD_MAX_SIZE=256M
       - PHP_POST_MAX_SIZE=256M
     env_file:
