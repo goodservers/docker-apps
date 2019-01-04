@@ -1,9 +1,9 @@
 # specify env variables saved in Gitlab
 .createEnv: &createEnv |
-  echo "WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}" >> .env
-  echo "WORDPRESS_DB_USER=${WORDPRESS_DB_USER}" >> .env
-  echo "WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}" >> .env
-  echo "WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}" >> .env
+  echo "WORDPRESS_DB_HOST=${DB_HOSTNAME}" >> .env
+  echo "WORDPRESS_DB_USER=${DB_USERNAME}" >> .env
+  echo "WORDPRESS_DB_NAME=${DB_NAME}" >> .env
+  echo "WORDPRESS_DB_PASSWORD=${DB_PASSWORD}" >> .env
   echo "SMTP_SERVER=${SMTP_SERVER}" >> .env
   echo "SMTP_USERNAME=${SMTP_USERNAME}" >> .env
   echo "SMTP_PASSWORD=${SMTP_PASSWORD}" >> .env
