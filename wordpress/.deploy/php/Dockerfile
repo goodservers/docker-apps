@@ -1,5 +1,7 @@
 FROM php:7.2-fpm-alpine
-
+ENV WORDPRESS_VERSION={{WORDPRESS_VERSION}}
+ENV PHP_UPLOAD_MAX_SIZE={{PHP_UPLOAD_MAX_SIZE}}
+ENV PHP_POST_MAX_SIZE={{PHP_POST_MAX_SIZE}}
 WORKDIR /var/www/html
 
 # docker-entrypoint.sh dependencies
