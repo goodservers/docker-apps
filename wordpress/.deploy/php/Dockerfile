@@ -56,8 +56,8 @@ RUN set -ex; \
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
-RUN printf "[PHP]\upload_max_filesize = %s\n" "${PHP_UPLOAD_MAX_SIZE}" > /usr/local/etc/php/conf.d/upload_max_size.ini
-RUN printf "[PHP]\post_max_filesize = %s\n" "${PHP_POST_MAX_SIZE}" > /usr/local/etc/php/conf.d/post_max_size.ini
+RUN printf "upload_max_filesize = %s\n" "${PHP_UPLOAD_MAX_SIZE}" > /usr/local/etc/php/conf.d/upload_max_size.ini
+RUN printf "post_max_size = %s\n" "${PHP_POST_MAX_SIZE}" > /usr/local/etc/php/conf.d/post_max_size.ini
 
 RUN chmod 777 /usr/local/bin/docker-entrypoint.sh
 
