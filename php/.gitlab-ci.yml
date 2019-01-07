@@ -20,7 +20,7 @@ build:
     DOCKER_DRIVER: overlay2
   before_script:
     - docker version
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker pull $CONTAINER_IMAGE_NGINX:latest || true
     - docker build -f ./.deploy/nginx/Dockerfile --cache-from $CONTAINER_IMAGE_NGINX:latest --tag $CONTAINER_IMAGE_NGINX:$CI_BUILD_REF --tag $CONTAINER_IMAGE_NGINX:latest .
@@ -51,4 +51,4 @@ deploy:
   script:
     - *createEnv
     - scp -r ./.env ./.deploy ./docker-compose.yml user@${DEPLOYMENT_SERVER_IP}:~/
-    - ssh user@$DEPLOYMENT_SERVER_IP "docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} registry.gitlab.com; docker-compose pull; docker-compose -f docker-compose.yml --project-name=$(date +%y%m%d%H%M%S) up -d;"
+    - ssh user@$DEPLOYMENT_SERVER_IP "docker login -u $CI_REGISTRY_USER -p ${CI_JOB_TOKEN} $CI_REGISTRY; docker-compose pull; docker-compose -f docker-compose.yml --project-name=$(date +%y%m%d%H%M%S) up -d;"
