@@ -4,8 +4,14 @@ FROM php:7.2-fpm-alpine
 ENV DRUPAL_VERSION={{DRUPAL_VERSION}}
 ENV PHP_UPLOAD_MAX_SIZE={{PHP_UPLOAD_MAX_SIZE}}
 ENV PHP_POST_MAX_SIZE={{PHP_POST_MAX_SIZE}}
-
 WORKDIR /var/www/html
+
+# docker-entrypoint.sh dependencies
+RUN apk add --no-cache \
+# in theory, docker-entrypoint.sh is POSIX-compliant, but priority is a working, consistent image
+		bash \
+# BusyBox sed is not sufficient for some of our sed expressions
+		sed
 
 # install the PHP extensions we need
 # postgresql-dev is needed for https://bugs.alpinelinux.org/issues/3642
@@ -46,12 +52,22 @@ RUN { \
 		echo 'opcache.enable_cli=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
-RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz \
-	&& tar -xz --strip-components=1 -f drupal.tar.gz \
-	&& rm drupal.tar.gz \
-	&& chown -R www-data:www-data sites modules themes
+VOLUME /var/www/html
+
+RUN mkdir /usr/src/drupal
+
+RUN set -ex; \
+  curl -o drupal.tar.gz -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz"; \
+	tar -xz --strip-components=1 -f drupal.tar.gz -C /usr/src/drupal; \
+	rm drupal.tar.gz; \
+	chown -R www-data:www-data /usr/src/drupal
+
+COPY docker-entrypoint.sh /usr/local/bin/
 
 RUN printf "upload_max_filesize = %s\n" "${PHP_UPLOAD_MAX_SIZE}" > /usr/local/etc/php/conf.d/upload_max_size.ini
 RUN printf "post_max_size = %s\n" "${PHP_POST_MAX_SIZE}" > /usr/local/etc/php/conf.d/post_max_size.ini
 
+RUN chmod 777 /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]

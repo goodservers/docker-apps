@@ -44,7 +44,9 @@ services:
     env_file:
       - .env
     volumes:
-      - "/docker/{{PROJECT_NAME}}/data/wp-content:/var/www/html/wp-content"
+      - "/docker/{{PROJECT_NAME}}/data/modules:/var/www/html/modules"
+      - "/docker/{{PROJECT_NAME}}/data/sites:/var/www/html/sites"
+      - "/docker/{{PROJECT_NAME}}/data/themes:/var/www/html/themes"
     networks:
       - nginx-proxy
     external_links:
