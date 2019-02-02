@@ -1,7 +1,5 @@
 FROM php:7.2-fpm-alpine
-ENV WORDPRESS_VERSION={{WORDPRESS_VERSION}}
-ENV PHP_UPLOAD_MAX_SIZE={{PHP_UPLOAD_MAX_SIZE}}
-ENV PHP_POST_MAX_SIZE={{PHP_POST_MAX_SIZE}}
+
 WORKDIR /var/www/html
 
 # docker-entrypoint.sh dependencies
@@ -47,6 +45,8 @@ VOLUME /var/www/html
 # ADD . /usr/src/wordpress
 RUN mkdir /usr/src/wordpress
 
+ENV WORDPRESS_VERSION={{WORDPRESS_VERSION}}
+
 RUN set -ex; \
 	curl -o wordpress.tar.gz -fSL "https://wordpress.org/wordpress-${WORDPRESS_VERSION}.tar.gz"; \
 	tar -xzf wordpress.tar.gz -C /usr/src/; \
@@ -54,6 +54,9 @@ RUN set -ex; \
 	chown -R www-data:www-data /usr/src/wordpress
 
 COPY docker-entrypoint.sh /usr/local/bin/
+
+ENV PHP_UPLOAD_MAX_SIZE={{PHP_UPLOAD_MAX_SIZE}}
+ENV PHP_POST_MAX_SIZE={{PHP_POST_MAX_SIZE}}
 
 RUN printf "upload_max_filesize = %s\n" "${PHP_UPLOAD_MAX_SIZE}" > /usr/local/etc/php/conf.d/upload_max_size.ini
 RUN printf "post_max_size = %s\n" "${PHP_POST_MAX_SIZE}" > /usr/local/etc/php/conf.d/post_max_size.ini

@@ -1,9 +1,6 @@
 # from https://www.drupal.org/docs/8/system-requirements/drupal-8-php-requirements
 FROM php:7.2-fpm-alpine
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION={{DRUPAL_VERSION}}
-ENV PHP_UPLOAD_MAX_SIZE={{PHP_UPLOAD_MAX_SIZE}}
-ENV PHP_POST_MAX_SIZE={{PHP_POST_MAX_SIZE}}
 WORKDIR /var/www/html
 
 # docker-entrypoint.sh dependencies
@@ -56,6 +53,8 @@ VOLUME /var/www/html
 
 RUN mkdir /usr/src/drupal
 
+ENV DRUPAL_VERSION={{DRUPAL_VERSION}}
+
 RUN set -ex; \
   curl -o drupal.tar.gz -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz"; \
 	tar -xz --strip-components=1 -f drupal.tar.gz -C /usr/src/drupal; \
@@ -63,6 +62,9 @@ RUN set -ex; \
 	chown -R www-data:www-data /usr/src/drupal
 
 COPY docker-entrypoint.sh /usr/local/bin/
+
+ENV PHP_UPLOAD_MAX_SIZE={{PHP_UPLOAD_MAX_SIZE}}
+ENV PHP_POST_MAX_SIZE={{PHP_POST_MAX_SIZE}}
 
 RUN printf "upload_max_filesize = %s\n" "${PHP_UPLOAD_MAX_SIZE}" > /usr/local/etc/php/conf.d/upload_max_size.ini
 RUN printf "post_max_size = %s\n" "${PHP_POST_MAX_SIZE}" > /usr/local/etc/php/conf.d/post_max_size.ini
