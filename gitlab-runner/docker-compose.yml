@@ -1,0 +1,28 @@
+version: '3'
+networks:
+  backend:
+
+services:
+  {{PROJECT_NAME}}-runner:
+    hostname: {{PROJECT_NAME}}-runner
+    build:
+      dockerfile: ./.deploy/Dockerfile
+      context: .
+    image: {{{REGISTRY_URL}}}/{{PROJECT_NAME}}-runner:latest
+    networks:
+      - backend
+    restart: always
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  {{PROJECT_NAME}}-dind:
+    image: docker:18.06.1-ce-dind
+    restart: always
+    privileged: true
+    hostname: docker
+    networks:
+      - backend
+    volumes:
+      - /var/lib/docker
+    command:
+      - --storage-driver=overlay2
+
